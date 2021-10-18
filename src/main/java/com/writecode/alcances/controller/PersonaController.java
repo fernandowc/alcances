@@ -2,7 +2,6 @@ package com.writecode.alcances.controller;
 
 import com.writecode.alcances.model.Persona;
 import com.writecode.alcances.service.PersonaService;
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -12,9 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api")
@@ -30,6 +26,17 @@ public class PersonaController {
         return Single.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_STREAM_JSON)
                 .body(allPersonas));
+    }
+
+    @GetMapping(path = "/persona/{id}")
+    public Single<ResponseEntity<Maybe<Persona>>> listarPorId(@PathVariable("id") String id)
+    {
+        Maybe<Persona> idpersona = personaService.listarPorId(id);
+        return personaService.listarPorId(id)
+                .map(p -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(idpersona))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping(path = "/persona")
@@ -56,7 +63,8 @@ public class PersonaController {
                 .map(p -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_STREAM_JSON)
                         .body(p))
-                .defaultIfEmpty(new ResponseEntity<Persona>(HttpStatus.NOT_FOUND));
+                .defaultIfEmpty(new ResponseEntity<Persona>(HttpStatus.NOT_FOUND))
+                .doOnError(p -> System.out.println("ocurrió un error: " + p));
     }
 
 }

@@ -8,9 +8,13 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+
+import java.util.Collections;
 
 @AllArgsConstructor
 @Service
@@ -20,9 +24,13 @@ public class PersonaServiceImpl implements PersonaService {
     private PersonaRepository personaRepository;
 
 
+    private static Logger logger = LoggerFactory.getLogger(PersonaServiceImpl.class);
+
+
     @Override
     public Flowable<Persona> listarPersona() {
-        return personaRepository.findAll();
+        return personaRepository.findAll()
+                .filter(name -> name.getNombre().equalsIgnoreCase("Luis"));
     }
 
     @Override
